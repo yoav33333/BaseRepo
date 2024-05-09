@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class TeleOp extends LinearOpMode {
     //Variables
@@ -12,10 +11,14 @@ public class TeleOp extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()){
+            func(1);
             //Running Code
         }
 
-        //function
 
+    }
+    //function
+
+    public void func(double x){
     }
 }
