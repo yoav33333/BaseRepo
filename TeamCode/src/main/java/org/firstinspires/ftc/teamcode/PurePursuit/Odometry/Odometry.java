@@ -87,12 +87,20 @@ public class Odometry extends CommandBase {
         return wheelH - EncoderHDisFromCenter*Angle();
     }
 
+    public double R0(){
+        return FWD()/Angle();
+    }
+
+    public double R1(){
+        return STR()/Angle();
+    }
+
     public double RelativeXPos(){
-        return FWD()*Math.cos(Angle()) - STR()*Math.sin(Angle());
+        return R0()*Math.sin(Angle()) - R1()*(1-Math.cos(Angle()));
     }
 
     public double RelativeYPos(){
-        return STR()*Math.cos(Angle()) + FWD()*Math.sin(Angle());
+        return R1()*Math.sin(Angle()) + R0()*(1-Math.cos(Angle()));
     }
 
 
