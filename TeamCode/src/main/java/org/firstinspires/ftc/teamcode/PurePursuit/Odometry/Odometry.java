@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode.PurePursuit.Odometry;
 
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Subsystems.DrivetrainSubsystem;
 
 public class Odometry extends CommandBase {
 
-    double GlobalX;
-    double GlobalY;
+    static double GlobalX;
+    static double GlobalY;
     double GlobalAngle;
     double wheelL;
     double wheelR;
@@ -32,6 +36,7 @@ public class Odometry extends CommandBase {
     final double ticksPerInchR = ticksPerRotationR*wheelCircumferenceR;
     final double ticksPerInchL = ticksPerRotationL*wheelCircumferenceL;
     final double ticksPerInchH = ticksPerRotationH*wheelCircumferenceH;
+    TelemetryPacket packet = new TelemetryPacket();
 
 
     DrivetrainSubsystem drivetrainSubsystem;
@@ -49,6 +54,17 @@ public class Odometry extends CommandBase {
         GlobalX += RelativeXPos();
         GlobalY += RelativeYPos();
         GlobalAngle += Angle();
+        packet.fieldOverlay().drawImage("/dash/ftc.jpg", 24, 24, 48, 48);
+        Canvas c = packet.fieldOverlay();
+        c.strokeCircle(GlobalX, GlobalY, 10);
+
+
+    }
+    public static void drawRobot(Canvas c) {
+        final double ROBOT_RADIUS = 9;
+
+        c.setStrokeWidth(1);
+        c.strokeCircle(GlobalX, GlobalY, ROBOT_RADIUS);
 
     }
 
