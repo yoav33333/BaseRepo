@@ -1,10 +1,17 @@
 package org.firstinspires.ftc.teamcode.PurePursuit.Odometry;
 
+import static org.firstinspires.ftc.teamcode.PurePursuit.Odometry.DriveConstants.EncoderHDisFromCenter;
+import static org.firstinspires.ftc.teamcode.PurePursuit.Odometry.DriveConstants.EncoderLeftDisFromCenter;
+import static org.firstinspires.ftc.teamcode.PurePursuit.Odometry.DriveConstants.EncoderRightDisFromCenter;
+import static org.firstinspires.ftc.teamcode.PurePursuit.Odometry.DriveConstants.ticksPerInchH;
+import static org.firstinspires.ftc.teamcode.PurePursuit.Odometry.DriveConstants.ticksPerInchL;
+import static org.firstinspires.ftc.teamcode.PurePursuit.Odometry.DriveConstants.ticksPerInchR;
+
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.geometry.Pose2d;
+import com.arcrobotics.ftclib.geometry.Rotation2d;
 
 import org.firstinspires.ftc.teamcode.Subsystems.DrivetrainSubsystem;
 
@@ -12,62 +19,49 @@ public class Odometry extends CommandBase {
 
     static double GlobalX;
     static double GlobalY;
-    double GlobalAngle;
+    Rotation2d GlobalAngle;
     double wheelL;
     double wheelR;
     double wheelH;
 
-    final double EncoderLeftDisFromCenter = 8;
-    final double EncoderRightDisFromCenter = -8;
-    final double EncoderHDisFromCenter = 8;
 
-    final double wheelDiameterL = 2;
-    final double wheelDiameterR = 2;
-    final double wheelDiameterH = 2;
-
-    final double wheelCircumferenceL  = wheelDiameterL*Math.PI;
-    final double wheelCircumferenceR = wheelDiameterR*Math.PI;
-    final double wheelCircumferenceH = wheelDiameterH*Math.PI;
-
-    final int ticksPerRotationR = 8192;
-    final int ticksPerRotationL = 8192;
-    final int ticksPerRotationH = 8192;
-
-    final double ticksPerInchR = ticksPerRotationR*wheelCircumferenceR;
-    final double ticksPerInchL = ticksPerRotationL*wheelCircumferenceL;
-    final double ticksPerInchH = ticksPerRotationH*wheelCircumferenceH;
-    TelemetryPacket packet = new TelemetryPacket();
-
+    TelemetryPacket packet;
+    public static Pose2d robotGlobalPos;
 
     DrivetrainSubsystem drivetrainSubsystem;
-    public Odometry(DrivetrainSubsystem drivetrainSubsystem){
+    public void ResetPose(double globalX, double globalY, Rotation2d globalAngle){
+        GlobalX = globalX;
+        GlobalY = globalY;
+        GlobalAngle = globalAngle;
+    }
+
+    public Odometry(DrivetrainSubsystem drivetrainSubsystem, TelemetryPacket packet){
         this.drivetrainSubsystem = drivetrainSubsystem;
+        this.packet = packet;
+
         addRequirements(drivetrainSubsystem);
     }
 
-    public void execute(){
-        update();
-    }
+
 
     public void update(){
         Read();
         GlobalX += RelativeXPos();
         GlobalY += RelativeYPos();
-        GlobalAngle += Angle();
+        GlobalAngle.rotateBy(new Rotation2d(Math.toRadians(Angle())));
+        robotGlobalPos = new Pose2d(GlobalX,GlobalY,GlobalAngle);
         packet.fieldOverlay().drawImage("/dash/ftc.jpg", 24, 24, 48, 48);
         Canvas c = packet.fieldOverlay();
         c.strokeCircle(GlobalX, GlobalY, 10);
 
 
-    }
-    public static void drawRobot(Canvas c) {
-        final double ROBOT_RADIUS = 9;
-
-        c.setStrokeWidth(1);
-        c.strokeCircle(GlobalX, GlobalY, ROBOT_RADIUS);
 
     }
 
+
+    public static Pose2d getGlobalsPos(){
+        return robotGlobalPos;
+    }
 
     public void Read(){
         wheelH = drivetrainSubsystem.hEncoder()*ticksPerInchH- wheelH;
