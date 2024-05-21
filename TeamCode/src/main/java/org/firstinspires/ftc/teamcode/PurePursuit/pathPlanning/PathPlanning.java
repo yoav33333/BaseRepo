@@ -7,7 +7,7 @@ import java.util.List;
 
 public class PathPlanning {
     public HashMap<Integer, Pose2d> Points = new HashMap<Integer, Pose2d>();
-    List<Pose2d> MainPoints;
+    public List<Pose2d> MainPoints;
     public PathPlanning(List<Pose2d> MainPoints) {
         this.MainPoints = MainPoints;
 

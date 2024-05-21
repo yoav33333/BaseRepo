@@ -19,7 +19,6 @@ public class MainPP extends CommandOpMode {
     BulkReadsSubsystem bulkReadsSubsystem;
     TelemetryPacket packet;
     BulkReadCommand bulkReadCommand;
-    Odometry odometry;
     PathFollowing pathFollowing;
     PathPlanning pathPlanning;
     List<Pose2d> MainPoints;
@@ -35,8 +34,7 @@ public class MainPP extends CommandOpMode {
         bulkReadsSubsystem = new BulkReadsSubsystem(hardwareMap);
         bulkReadCommand = new BulkReadCommand(bulkReadsSubsystem);
         drivetrainSubsystem = new DrivetrainSubsystem(hardwareMap);
-        odometry = new Odometry(drivetrainSubsystem, packet);
-        pathFollowing = new PathFollowing(drivetrainSubsystem, odometry, pathPlanning);
+        pathFollowing = new PathFollowing(drivetrainSubsystem, pathPlanning);
 
 
 

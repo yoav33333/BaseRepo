@@ -1,11 +1,17 @@
 package org.firstinspires.ftc.teamcode.PurePursuit.pathFollowing;
 
+import static org.firstinspires.ftc.teamcode.PurePursuit.Odometry.DriveConstants.ticksPerInchH;
+import static org.firstinspires.ftc.teamcode.PurePursuit.Odometry.DriveConstants.ticksPerInchL;
+import static org.firstinspires.ftc.teamcode.PurePursuit.Odometry.DriveConstants.ticksPerInchR;
+
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.geometry.Pose2d;
+import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 
 import org.firstinspires.ftc.teamcode.PurePursuit.Odometry.Odometry;
 import org.firstinspires.ftc.teamcode.PurePursuit.pathPlanning.PathPlanning;
+import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Subsystems.DrivetrainSubsystem;
 
 import java.util.HashMap;
@@ -18,52 +24,70 @@ public class PathFollowing extends CommandBase {
     HashMap<Integer, Pose2d> PointsList;
     PID_V PID;
     int PointIndex = 0;
-    int bestPoint = 0;
+    Pose2d bestPoint;
     Vector2d Difference;
-    public PathFollowing(DrivetrainSubsystem drivetrainSubsystem, Odometry odometry, PathPlanning pathPlanning, int bestPoint, int PointIndex){
-        this.drivetrainSubsystem = drivetrainSubsystem;
-        this.pathPlanning = pathPlanning;
-        this.odometry = odometry;
-        PointsList = pathPlanning.Points;
-        this.bestPoint = bestPoint;
-        this.PointIndex = PointIndex;
-    }
-    public PathFollowing(DrivetrainSubsystem drivetrainSubsystem, Odometry odometry, PathPlanning pathPlanning, int bestPoint){
-        this.drivetrainSubsystem = drivetrainSubsystem;
-        this.pathPlanning = pathPlanning;
-        this.odometry = odometry;
-        PointsList = pathPlanning.Points;
-        this.bestPoint = bestPoint;
-    }
 
-    public PathFollowing(DrivetrainSubsystem drivetrainSubsystem, Odometry odometry, PathPlanning pathPlanning){
+    double wheelH;
+
+    double wheelL;
+    double wheelR;
+
+    PID_H pidH;
+
+    int CurrentPointIndex = 0;
+
+    Vector2d MovingVector;
+    Rotation2d FinalAngle;
+
+    public PathFollowing(DrivetrainSubsystem drivetrainSubsystem, PathPlanning pathPlanning){
         this.drivetrainSubsystem = drivetrainSubsystem;
         this.pathPlanning = pathPlanning;
-        this.odometry = odometry;
-        PointsList = pathPlanning.Points;
+        FinalAngle = pathPlanning.MainPoints.get(pathPlanning.MainPoints.size()-1).getRotation();
+
     }
 
     public void execute(){
 
-        PID = new PID_V(new Vector2d(NextPoint().getX(), NextPoint().getY()), new Vector2d(Read().getX(), Read().getY()));
-        PID.RunPID();
+        Run();
 
     }
 
 
+    public void ReadOdometry(){
+        wheelH = drivetrainSubsystem.hEncoder()*ticksPerInchH- wheelH;
+        wheelL = drivetrainSubsystem.lvEncoder()*ticksPerInchL-wheelL;
+        wheelR = drivetrainSubsystem.rvEncoder()*ticksPerInchR-wheelR;
+    }
+
     public Pose2d Read(){
+        ReadOdometry();
+        odometry = new Odometry(wheelH,wheelL,wheelR);
         return Odometry.getGlobalsPos();
     }
 
     public Pose2d NextPoint(){
-        for (int i = 0; i < PointsList.size(); i++) {
-            if (PointsList.get(i).minus(Read()<Difference)
-        }
+
+        //TODO
         return PointsList.get(PointIndex--);
     }
 
+    public Vector2d Pose2dToVector2d(Pose2d pose2d){
+
+        return new Vector2d(pose2d.getX(), pose2d.getY());
+    }
+
+    public void RunMecanum(){
+        drivetrainSubsystem.AutoDrive(MovingVector.getX(), MovingVector.getY(), pidH.out, Read().getHeading());
+    }
+
     public void Run() {
-        if (NextPoint().)
+        if (NextPoint() == bestPoint){
+            PID = new PID_V(Pose2dToVector2d(bestPoint), Pose2dToVector2d(Read()));
+            MovingVector = PID.RunPID();
+        }
+        pidH = new PID_H(FinalAngle, Read().getRotation());
+        RunMecanum();
+
     }
 
 

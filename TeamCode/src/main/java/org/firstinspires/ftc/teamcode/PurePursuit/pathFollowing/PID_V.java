@@ -24,10 +24,6 @@ public class PID_V {
 
     }
 
-
-
-
-
     // Elapsed timer class from SDK, please use it, it's epic
     ElapsedTime timer = new ElapsedTime();
     public Vector2d RunPID() {

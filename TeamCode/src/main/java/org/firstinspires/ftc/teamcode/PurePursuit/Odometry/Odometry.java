@@ -15,7 +15,7 @@ import com.arcrobotics.ftclib.geometry.Rotation2d;
 
 import org.firstinspires.ftc.teamcode.Subsystems.DrivetrainSubsystem;
 
-public class Odometry extends CommandBase {
+public class Odometry {
 
     static double GlobalX;
     static double GlobalY;
@@ -35,11 +35,11 @@ public class Odometry extends CommandBase {
         GlobalAngle = globalAngle;
     }
 
-    public Odometry(DrivetrainSubsystem drivetrainSubsystem, TelemetryPacket packet){
-        this.drivetrainSubsystem = drivetrainSubsystem;
-        this.packet = packet;
+    public Odometry(double wheelH, double wheelL, double wheelR){
+        this.wheelH = wheelH;
+        this.wheelL = wheelL;
+        this.wheelR = wheelR;
 
-        addRequirements(drivetrainSubsystem);
     }
 
 
